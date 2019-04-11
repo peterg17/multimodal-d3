@@ -57,7 +57,7 @@ var link = svg.selectAll(".link")
         .enter().append("line")
           .attr("class", "link")
           .style("stroke", "#999");
-var node = svg.selectAll(".node")
+ var node = svg.selectAll(".node")
         .data(nodes)
       .enter().append("circle")
         .attr("class", "node")
@@ -68,7 +68,7 @@ var node = svg.selectAll(".node")
 node.append("title")
     .text(function(d) { return "hand: " + d.hand + ", finger: " + d.finger; });
 force.on("tick", function(e) {
-  var k = 30 * e.alpha;
+  var k = 10 * e.alpha;
   nodes.forEach(function(d) {
     d.x += d.hand & 1 ? k : -k;
   });
@@ -106,6 +106,7 @@ function getNext(handId) {
     if(id == 6 || id == 12) { // can't have more than 5 fingers per hand...
         id = -1;
     }
+    console.log(id);
     return id;
 }
 Array.prototype.unique = function() {
@@ -127,7 +128,12 @@ function reset(id) {
     d3.select("#n" + node.hand + "-" + node.finger)
       .style("fill", color(node.hand));
 }
+var ct = 0;
 Leap.loop(function(obj) {
+    if (obj.fingers.length > 0 && ct < 1) {
+        console.log(obj);
+        ct += 1;
+    }
     var ids = obj.fingers.map(function(d) {
         var hands = fingers.map(function(f) { return f.handId; }).unique();
         if(hands.indexOf(d.handId) == -1 && hands.length == 2) {
@@ -143,6 +149,7 @@ Leap.loop(function(obj) {
         }
         if(!finger) {
             var next = getNext(d.handId);
+            console.log("next: " + next);
             if(next == -1) {
                 return null;
             }
