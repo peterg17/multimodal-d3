@@ -86,7 +86,7 @@ var nodes = [
     node.fx = node.x
     node.fy = node.y
   }).on('drag', function (node) {
-    simulation.alphaTarget(0.7).restart()
+    simulation.alphaTarget(0.4).restart()
     node.fx = d3.event.x
     node.fy = d3.event.y
   }).on('end', function (node) {
@@ -155,7 +155,7 @@ Leap.loop({ hand: function(hand) {
   d3.select('#cursor').remove();
   
   screenPosition = hand.screenPosition();
-  cursorPosition = [screenPosition[0], screenPosition[1]];
+  cursorPosition = [screenPosition[0], screenPosition[1]+300];
   
   d3.select('svg')
           .append('circle')
@@ -184,6 +184,7 @@ Leap.loop({ hand: function(hand) {
         // console.log("grabbing");
         
         if (intersectNode != false) {
+          simulation.alphaTarget(0.4).restart()
           intersectNode.x = cursorPosition[0];
           intersectNode.y = cursorPosition[1];
         }
@@ -225,15 +226,12 @@ Leap.loop({ hand: function(hand) {
       // console.log("in else statement");
       if (intersectNode != false) {
         // console.log("inside if statement");
-        intersectNode.x = initialPosition[0];
-        intersectNode.y = initialPosition[1];
-        isGrabbing = false;
-        cursorPosition = [0,0];
-        screenPosition = [0,0];
+        // intersectNode.x = initialPosition[0];
+        // intersectNode.y = initialPosition[1];
         intersectNode = false;
-        initialPosition = false;
+        simulation.restart();
       }
-    }intersectNode.x = initialPosition[0];
+    }
     // intersectNode.y = initialPosition[1];
     console.log("insersect node is: " + JSON.stringify(intersectNode));
 }}).use('screenPosition', {scale: LEAPSCALE});
