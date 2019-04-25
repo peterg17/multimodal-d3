@@ -1,15 +1,16 @@
-
-/*
-if (grab)
-    find node by cursor position
-        write function to intersect coordinate with node
-    start drag with selected object
-
-
-*/
-
+var VOICEINDEX = 17; // UK British Female
+var DEBUGSPEECH = true;
 var LEAPSCALE = 0.6;
+var Surface = famous.core.Surface;
 
+var otherFeedback = new Surface({
+  content: "",
+  size: [undefined, 50],
+  properties: {
+    backgroundColor: "white",
+    color: "black"
+  }
+});
 var nodes = [
     { id: "mammal", group: 0, label: "Mammals", level: 1 },
     { id: "dog"   , group: 0, label: "Dogs"   , level: 2 },
@@ -40,6 +41,24 @@ var nodes = [
       { target: "pike"  , source: "cat" , strength: 0.1 }
   ]
 
+  var voicesReady = false;
+  window.speechSynthesis.onvoiceschanged = function() {
+    voicesReady = true;
+    // Uncomment to see a list of voices
+    //console.log("Choose a voice:\n" + window.speechSynthesis.getVoices().map(function(v,i) { return i + ": " + v.name; }).join("\n"));
+  };
+
+var generateSpeech = function(message, callback) {
+  if (voicesReady) {
+    var msg = new SpeechSynthesisUtterance();
+    msg.voice = window.speechSynthesis.getVoices()[VOICEINDEX];
+    msg.text = message;
+    msg.rate = 0.2;
+    if (typeof callback !== "undefined")
+      msg.onend = callback;
+    speechSynthesis.speak(msg);
+  }
+};
     
   function getNeighbors(node) {
     return links.reduce(function (neighbors, link) {
@@ -213,7 +232,7 @@ Leap.loop({ hand: function(hand) {
                   && bbox.y1 <= cursorPosition[1] && bbox.y2 >= cursorPosition[1]) {
                     initialPosition = [x, y];
                     intersectNode = d;
-                    d3.select(this).attr('fill', 'lightgreen');
+                    d3.select(this).attr('fill', 'black');
                     console.log("intersects");
                 }
               }
@@ -225,9 +244,13 @@ Leap.loop({ hand: function(hand) {
     } else {
       // console.log("in else statement");
       if (intersectNode != false) {
-        // console.log("inside if statement");
-        // intersectNode.x = initialPosition[0];
-        // intersectNode.y = initialPosition[1];
+        d3.selectAll('circle').each(function(node) {
+          if (d3.select(this).attr('id') != 'cursor') {
+            if (node.id == intersectNode.id) {
+              d3.select(this).attr('fill', 'gray');
+            }
+          }
+        }); 
         intersectNode = false;
         simulation.restart();
       }
@@ -235,3 +258,82 @@ Leap.loop({ hand: function(hand) {
     // intersectNode.y = initialPosition[1];
     console.log("insersect node is: " + JSON.stringify(intersectNode));
 }}).use('screenPosition', {scale: LEAPSCALE});
+
+// var colors = new Set(["blue","red","green",]);
+var processSpeech = function(transcript) {
+//   // Helper function to detect if any commands appear in a string
+  var userSaid = function(str, commands) {
+    var lowercaseStr = str.toLowerCase();
+    for (var i = 0; i < commands.length; i++) {
+      if (lowercaseStr.indexOf(commands[i]) > -1)
+        return commands[i];
+    }
+    return false;
+  };
+
+  var processed = false;
+    // Detect the 'start' command, and start the game if it was said
+  var deletion = userSaid(transcript, ['delete'])
+  if (deletion) {
+    d3.selectAll('circle').each(function(d) {
+    // Logs the cx and cy attributes of a node.
+      if (d3.select(this).attr('id') != 'cursor') {
+        // x = d3.select(this).attr('cx')
+        // y = d3.select(this).attr('cy')
+        x = d.x;
+        y = d.y;
+        // console.log("james is tired");
+        // console.log(x,y);
+        var bound = 30;
+        var bbox = {
+            x1: x-bound,
+            x2: x+bound,
+            y1: y-bound,
+            y2: y+bound,
+        };
+        // console.log("bbox: " + JSON.stringify(bbox));
+        // console.log("cursor pos: " + cursorPosition);
+        if (bbox.x1 <= cursorPosition[0] && bbox.x2 >= cursorPosition[0]
+          && bbox.y1 <= cursorPosition[1] && bbox.y2 >= cursorPosition[1]) {
+            d3.select(this).remove();
+        }
+      }
+    });
+    processed = true;
+  }
+
+  var changeColor = userSaid(transcript, ["blue","red","green"])
+
+  if (changeColor) {
+    d3.selectAll('circle').each(function(d) {
+    // Logs the cx and cy attributes of a node.
+      if (d3.select(this).attr('id') != 'cursor') {
+        // x = d3.select(this).attr('cx')
+        // y = d3.select(this).attr('cy')
+        x = d.x;
+        y = d.y;
+        // console.log("james is tired");
+        // console.log(x,y);
+        var bound = 30;
+        var bbox = {
+            x1: x-bound,
+            x2: x+bound,
+            y1: y-bound,
+            y2: y+bound,
+        };
+        // console.log("bbox: " + JSON.stringify(bbox));
+        // console.log("cursor pos: " + cursorPosition);
+        if (bbox.x1 <= cursorPosition[0] && bbox.x2 >= cursorPosition[0]
+          && bbox.y1 <= cursorPosition[1] && bbox.y2 >= cursorPosition[1]) {
+            d3.select(this).attr('fill', changeColor);
+        }
+      }
+    });
+    console.log()
+    processed = true;
+  }
+  
+  // place the ships in a better wa
+
+  return processed;
+};
