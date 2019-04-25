@@ -954,7 +954,7 @@ var processSpeech = function(transcript) {
     // console.log("transcript below:");
     console.log(transcript);
 
-    if (userSaid(transcript, ['zoom in'])) {
+    if (userSaid(transcript, ['zoom'])) {
         console.log('zoom in');
         svg.call(zoomBeh);
         console.log("current screen pointer at: " + cursorPosition);
