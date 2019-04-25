@@ -28,7 +28,7 @@
 //   };
 // }
 
-
+var DEBUGSPEECH = true;
 var debouncedProcessSpeech = _.debounce(processSpeech, 500);
 
 console.log("loading setup speech");
@@ -45,14 +45,13 @@ recognition.onresult = function(event) {
     else
       transcript += event.results[i][0].transcript;
   }
-  console.log("event: " + event);
+  // console.log(event);
 
-  if (DEBUGSPEECH) {
-    if (hasFinal)
-      otherFeedback.setContent("SPEECH DEBUG: ready");
-    else
-      otherFeedback.setContent("SPEECH DEBUG: " + transcript);
-  }
+  // if (hasFinal)
+  //   console.log("SPEECH DEBUG: ready");
+  // else
+  //   console.log("SPEECH DEBUG: " + transcript);
+  
 
   var processed = debouncedProcessSpeech(transcript);
   // var processed = processSpeech(transcript);
@@ -65,8 +64,6 @@ recognition.onresult = function(event) {
 // Restart recognition if it has stopped
 recognition.onend = function(event) {
   setTimeout(function() {
-    if (DEBUGSPEECH)
-      otherFeedback.setContent("SPEECH DEBUG: ready");
     recognition.start();
   }, 1000);
 };
