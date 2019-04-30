@@ -332,6 +332,16 @@ var processSpeech = function(transcript) {
     console.log()
     processed = true;
   }
+
+
+  if (userSaid(transcript, ["reset"])){
+    d3.selectAll('circle').each(function(d) {
+      // Logs the cx and cy attributes of a node.
+        if (d3.select(this).attr('id') != 'cursor') {
+          d3.select(this).attr('fill', 'gray');
+        }
+    });
+  }
   
   // place the ships in a better wa
 
