@@ -1,9 +1,12 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/d3_main.js',
+  entry: {
+    force: './src/force.js',
+    scatter: './src/scatter.js',
+  },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist')
   },
   module: {

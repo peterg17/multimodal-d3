@@ -1,16 +1,12 @@
+import * as d3 from 'd3';
+import * as Leap from 'leapjs';
+import 'leapjs-plugins';
+import _ from 'lodash';
+
 var VOICEINDEX = 17; // UK British Female
 var DEBUGSPEECH = true;
 var LEAPSCALE = 0.6;
-var Surface = famous.core.Surface;
 
-var otherFeedback = new Surface({
-  content: "",
-  size: [undefined, 50],
-  properties: {
-    backgroundColor: "white",
-    color: "black"
-  }
-});
 var nodes = [
     { id: "mammal", group: 0, label: "Mammals", level: 1 },
     { id: "dog"   , group: 0, label: "Dogs"   , level: 2 },
@@ -215,8 +211,10 @@ Leap.loop({ hand: function(hand) {
               if (d3.select(this).attr('id') != 'cursor') {
                 // x = d3.select(this).attr('cx')
                 // y = d3.select(this).attr('cy')
-                x = d.x;
-                y = d.y;
+                console.log("d.x value: " + JSON.stringify(d.x));
+                var x = d.x;
+                var y = d.y;
+                console.log("after first use of x");
                 // console.log("james is tired");
                 // console.log(x,y);
                 var bound = 30;
@@ -226,11 +224,13 @@ Leap.loop({ hand: function(hand) {
                     y1: y-bound,
                     y2: y+bound,
                 };
+                // console.log("after second use of x");
                 // console.log("bbox: " + JSON.stringify(bbox));
                 // console.log("cursor pos: " + cursorPosition);
                 if (bbox.x1 <= cursorPosition[0] && bbox.x2 >= cursorPosition[0]
                   && bbox.y1 <= cursorPosition[1] && bbox.y2 >= cursorPosition[1]) {
                     initialPosition = [x, y];
+                    console.log("after third use of x");
                     intersectNode = d;
                     d3.select(this).attr('fill', 'black');
                     console.log("intersects");
@@ -260,7 +260,7 @@ Leap.loop({ hand: function(hand) {
 }}).use('screenPosition', {scale: LEAPSCALE});
 
 // var colors = new Set(["blue","red","green",]);
-var processSpeech = function(transcript) {
+var processSpeech = function (transcript) {
 //   // Helper function to detect if any commands appear in a string
   var userSaid = function(str, commands) {
     var lowercaseStr = str.toLowerCase();
@@ -280,8 +280,9 @@ var processSpeech = function(transcript) {
       if (d3.select(this).attr('id') != 'cursor') {
         // x = d3.select(this).attr('cx')
         // y = d3.select(this).attr('cy')
-        x = d.x;
-        y = d.y;
+        console.log("d:" + JSON.stringify(d));
+        var x = d.x;
+        var y = d.y;
         // console.log("james is tired");
         // console.log(x,y);
         var bound = 30;
@@ -310,8 +311,8 @@ var processSpeech = function(transcript) {
       if (d3.select(this).attr('id') != 'cursor') {
         // x = d3.select(this).attr('cx')
         // y = d3.select(this).attr('cy')
-        x = d.x;
-        y = d.y;
+        var x = d.x;
+        var y = d.y;
         // console.log("james is tired");
         // console.log(x,y);
         var bound = 30;
@@ -347,3 +348,45 @@ var processSpeech = function(transcript) {
 
   return processed;
 };
+
+var DEBUGSPEECH = true;
+console.log(processSpeech);
+var debouncedProcessSpeech = _.debounce(processSpeech, 500);
+
+console.log("loading setup speech");
+var recognition = new webkitSpeechRecognition();
+recognition.continuous = true;
+recognition.interimResults = true;
+recognition.onresult = function(event) {
+  // Build the interim transcript, so we can process speech faster
+  var transcript = '';
+  var hasFinal = false;
+  for (var i = event.resultIndex; i < event.results.length; ++i) {
+    if (event.results[i].isFinal)
+      hasFinal = true;
+    else
+      transcript += event.results[i][0].transcript;
+  }
+  // console.log(event);
+
+  // if (hasFinal)
+  //   console.log("SPEECH DEBUG: ready");
+  // else
+  //   console.log("SPEECH DEBUG: " + transcript);
+  
+
+  var processed = debouncedProcessSpeech(transcript);
+  // var processed = processSpeech(transcript);
+
+  // If we reacted to speech, kill recognition and restart
+  if (processed) {
+    recognition.stop();
+  }
+};
+// Restart recognition if it has stopped
+recognition.onend = function(event) {
+  setTimeout(function() {
+    recognition.start();
+  }, 1000);
+};
+recognition.start();
