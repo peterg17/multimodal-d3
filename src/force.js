@@ -211,10 +211,8 @@ Leap.loop({ hand: function(hand) {
               if (d3.select(this).attr('id') != 'cursor') {
                 // x = d3.select(this).attr('cx')
                 // y = d3.select(this).attr('cy')
-                console.log("d.x value: " + JSON.stringify(d.x));
                 var x = d.x;
                 var y = d.y;
-                console.log("after first use of x");
                 // console.log("james is tired");
                 // console.log(x,y);
                 var bound = 30;
@@ -230,10 +228,8 @@ Leap.loop({ hand: function(hand) {
                 if (bbox.x1 <= cursorPosition[0] && bbox.x2 >= cursorPosition[0]
                   && bbox.y1 <= cursorPosition[1] && bbox.y2 >= cursorPosition[1]) {
                     initialPosition = [x, y];
-                    console.log("after third use of x");
                     intersectNode = d;
                     d3.select(this).attr('fill', 'black');
-                    console.log("intersects");
                 }
               }
             });
@@ -256,7 +252,6 @@ Leap.loop({ hand: function(hand) {
       }
     }
     // intersectNode.y = initialPosition[1];
-    console.log("insersect node is: " + JSON.stringify(intersectNode));
 }}).use('screenPosition', {scale: LEAPSCALE});
 
 // var colors = new Set(["blue","red","green",]);
@@ -280,7 +275,6 @@ var processSpeech = function (transcript) {
       if (d3.select(this).attr('id') != 'cursor') {
         // x = d3.select(this).attr('cx')
         // y = d3.select(this).attr('cy')
-        console.log("d:" + JSON.stringify(d));
         var x = d.x;
         var y = d.y;
         // console.log("james is tired");
@@ -330,7 +324,6 @@ var processSpeech = function (transcript) {
         }
       }
     });
-    console.log()
     processed = true;
   }
 
