@@ -1,0 +1,36 @@
+{
+  "name": "multimodal_d3",
+  "version": "1.0.0",
+  "description": "Final project for 6.835: Intelligent Multimodal User Interfaces multimodal interactions using gestures for d3 visualizations",
+  "private": true,
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peterg17/multimodal-d3.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/peterg17/multimodal-d3/issues"
+  },
+  "homepage": "https://github.com/peterg17/multimodal-d3#readme",
+  "devDependencies": {
+    "css-loader": "^2.1.1",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.1"
+  },
+  "dependencies": {
+    "d3": "^4.13.0",
+    "leapjs": "^0.6.4",
+    "leapjs-plugins": "^0.1.12",
+    "lodash": "^4.17.11"
+  }
+}
