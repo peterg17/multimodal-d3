@@ -1,6 +1,5 @@
 #!/bin/sh
 
-cd ../;
 npm run build;
 echo "new build created";
 
