@@ -30,6 +30,8 @@
   },
   "dependencies": {
     "d3": "^4.13.0",
+    "d3-tip": "^0.9.1",
+    "jquery": "^3.4.1",
     "leapjs": "^0.6.4",
     "leapjs-plugins": "^0.1.12",
     "lodash": "^4.17.11"
