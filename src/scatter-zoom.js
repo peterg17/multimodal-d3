@@ -4,6 +4,7 @@ import d3Tip from 'd3-tip';
 import * as Leap from 'leapjs';
 import 'leapjs-plugins';
 import './zoom.css';
+import _ from 'lodash';
 
 function randomData(samples) {
     var data = [],
@@ -180,6 +181,11 @@ var normalizedDisplay = document.getElementById("normPosition");
 var tipDisplay = document.getElementById("tipPosition");
 var windowDisplay = document.getElementById("windowPosition");
 
+var scatterPosition = [0,0];
+var normalizedPosition = [0,0,0];
+var dotsElem = document.getElementById("innerSpace");
+
+
 var controller = Leap.loop({enableGestures: true}, function(frame){
     scatter.select('#cursor').remove();
 
@@ -193,8 +199,7 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
     //     console.log(frame.hands);
     // } 
 
-    var scatterPosition = [0,0];
-    var normalizedPosition = [0,0,0];
+  
 
     if (frame.valid) {
         if (frame.pointables.length > 0) {
@@ -222,7 +227,6 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
         }
 
         if(frame.gestures.length > 0){
-            var dotsElem = document.getElementById("innerSpace");
             frame.gestures.forEach(function(gesture){
                 switch (gesture.type){
                   case "circle":
@@ -243,10 +247,14 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
                     // var randomZoom = d3.zoomIdentity.translate(scatterPosition[0], scatterPosition[1]).scale(k);
                     // var baseZoom = d3.zoomIdentity.translate(0,0).scale(1);
                     // dots.call(zoom.transform, randomZoom);
+                    
                     simulateClick(dotsElem, scatterPosition);
 
                   case "swipe":
                       console.log("Swipe gesture");
+                       var baseZoom = d3.zoomIdentity.translate(0,0).scale(1);
+                      dots.call(zoom.transform, baseZoom);
+
                 }
             });
           }
@@ -259,3 +267,75 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
   });
   controller.connect();
 
+
+  var processSpeech = function(transcript) {
+    // Helper function to detect if any commands appear in a string
+    var userSaid = function(str, commands) {
+      var lowercaseStr = str.toLowerCase();
+      for (var i = 0; i < commands.length; i++) {
+        if (lowercaseStr.indexOf(commands[i]) > -1)
+          return true;
+      }
+      return false;
+    };
+  
+    // console.log("transcript below:");
+    console.log(transcript);
+
+    if (userSaid(transcript, ['in'])) {
+        console.log('zoom in');
+        // var baseZoom = d3.zoomIdentity.duration(750).translate(scatterPosition[0],scatterPosition[1]).scale(2);
+        // dots.call(zoom.transform, baseZoom);
+        simulateClick(dotsElem, scatterPosition);
+
+
+    } else if (userSaid(transcript, ['out'])) {
+        console.log('zoom out');
+        var baseZoom = d3.zoomIdentity.translate(0,0).scale(1);
+        dots.call(zoom.transform, baseZoom);
+    } else {
+        console.log('false');
+    }
+};
+
+var DEBUGSPEECH = true;
+console.log(processSpeech);
+var debouncedProcessSpeech = _.debounce(processSpeech, 500);
+
+console.log("loading setup speech");
+var recognition = new webkitSpeechRecognition();
+recognition.continuous = true;
+recognition.interimResults = true;
+recognition.onresult = function(event) {
+  // Build the interim transcript, so we can process speech faster
+  var transcript = '';
+  var hasFinal = false;
+  for (var i = event.resultIndex; i < event.results.length; ++i) {
+    if (event.results[i].isFinal)
+      hasFinal = true;
+    else
+      transcript += event.results[i][0].transcript;
+  }
+  // console.log(event);
+
+  if (hasFinal)
+    console.log("SPEECH DEBUG: ready");
+  else
+    console.log("SPEECH DEBUG: " + transcript);
+  
+
+  var processed = debouncedProcessSpeech(transcript);
+  // var processed = processSpeech(transcript);
+
+  // If we reacted to speech, kill recognition and restart
+  if (processed) {
+    recognition.stop();
+  }
+};
+// Restart recognition if it has stopped
+recognition.onend = function(event) {
+  setTimeout(function() {
+    recognition.start();
+  }, 1000);
+};
+recognition.start();
