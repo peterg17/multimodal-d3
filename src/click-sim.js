@@ -81,6 +81,7 @@ function simulateClick (elem) {
     console.log("simulate click is called!");
     console.log(elem);
     var cancelled = !elem.dispatchEvent(event);
+    // var cancelled = !window.dispatchEvent(event);
     //   var cb = document.getElementById('circle1'); 
     //   var cancelled = !cb.dispatchEvent(event);
     //   if (cancelled) {
@@ -88,7 +89,7 @@ function simulateClick (elem) {
     //     alert("cancelled");
     //   } else {
     //     // None of the handlers called preventDefault.
-    //     alert("not cancelled");+
+    //     alert("not cancelled");
     //   }
 }
 

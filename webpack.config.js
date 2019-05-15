@@ -4,7 +4,8 @@ module.exports = {
   entry: {
     force: './src/force.js',
     scatter: './src/scatter.js',
-    click: './src/click-sim.js'
+    click: './src/click-sim.js',
+    scatterZoom: './src/scatter-zoom.js'
   },
   output: {
     filename: '[name].js',

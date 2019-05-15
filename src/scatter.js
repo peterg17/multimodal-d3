@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 import d3Tip from 'd3-tip';
-import data from './scatter.json';
+import cerealData from './scatter.json';
 import * as Leap from 'leapjs';
 import 'leapjs-plugins';
 import './scatter.css';
@@ -22,9 +22,12 @@ var xCat = "Calories",
     rCat = "Protein (g)",
     colorCat = "Manufacturer";
   
-const cerealData = data.cereal;
+const data = cerealData.cereal;
 
-cerealData.forEach(function(d) {
+console.log("cereal data: ");
+console.log(data);
+
+data.forEach(function(d) {
     d.Calories = +d.Calories;
     d.Carbs = +d.Carbs;
     d["Cups per Serving"] = +d["Cups per Serving"];
@@ -67,7 +70,7 @@ var tip = d3Tip()
     });
 
 var zoomBeh = d3.zoom()
-    .scaleExtent([0, 500])
+    .scaleExtent([1,8])
     .on("zoom", zoom);
 
 var svg = d3.select("#scatter")
@@ -80,7 +83,7 @@ var svg = d3.select("#scatter")
 
 svg.call(tip);
 
-svg.append("rect")
+var rect = svg.append("rect")
     .attr("width", width)
     .attr("height", height);
 
@@ -152,28 +155,14 @@ legend.append("text")
     .attr("dy", ".35em")
     .text(function(d) { return d; });
 
-d3.select("input").on("click", change);
 
-function change() {
-    xCat = "Carbs";
-    xMax = d3.max(data, function(d) { return d[xCat]; });
-    xMin = d3.min(data, function(d) { return d[xCat]; });
+function zoom(e) {
+    // svg.select(".x.axis").call(xAxis);
+    // svg.select(".y.axis").call(yAxis);
 
-    zoomBeh.x(x.domain([xMin, xMax])).y(y.domain([yMin, yMax]));
-
-    var svg = d3.select("#scatter").transition();
-
-    svg.select(".x.axis").duration(750).call(xAxis).select(".label").text(xCat);
-
-    objects.selectAll(".dot").transition().duration(1000).attr("transform", transform);
-}
-
-function zoom() {
-    svg.select(".x.axis").call(xAxis);
-    svg.select(".y.axis").call(yAxis);
-
-    svg.selectAll(".dot")
-        .attr("transform", transform);
+    // svg.selectAll(".dot")
+    //     .attr("transform", transform);
+    svg.attr("transform", d3.event.transform);
 }
 
 function transform(d) {
