@@ -49,6 +49,7 @@ var zoom = d3.zoom()
 
 var innerSpace = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .attr("id", "innerSpace")
             .call(zoom);
 
 var view = innerSpace.append("rect")
@@ -113,7 +114,14 @@ innerSpace.append("text")
 
 
 
-
+function zoomOut(selection) {
+    var zoomOutTransform = d3.zoomIdentity.translate(0,0).scale(1);
+    selection
+        .transition()
+            .duration(2000)
+            .ease(d3.easeQuadInOut)
+            .call(zoom.transform, zoomOutTransform);
+}
 
 function zoomed() {
     var new_xScale = d3.event.transform.rescaleX(x);
@@ -127,5 +135,127 @@ function zoomed() {
     dots.attr("transform", d3.event.transform);
 }
 
+function simulateClick (elem, pos) {
+    var event = new MouseEvent('dblclick', {
+        view: window,
+        clientX: pos[0],
+        clientY: pos[1],
+        bubbles: true,
+        cancelable: true
+      });
 
+    console.log("simulate click is called!");
+    console.log(elem);
+    console.log("at position: " + pos);
+    var cancelled = !elem.dispatchEvent(event);
+    // var cancelled = !window.dispatchEvent(event);
+    //   var cb = document.getElementById('circle1'); 
+    //   var cancelled = !cb.dispatchEvent(event);
+    //   if (cancelled) {
+    //     // A handler called preventDefault.
+    //     alert("cancelled");
+    //   } else {
+    //     // None of the handlers called preventDefault.
+    //     alert("not cancelled");
+    //   }
+}
+
+function simulateMouseUp (elem, pos) {
+    var event = new MouseEvent('mouseup', {
+        view: window,
+        clientX: pos[0],
+        clientY: pos[1],
+        k: 2,
+        bubbles: true,
+        cancelable: true
+    });
+
+    console.log("simulate mouseup is called!");
+    console.log(elem);
+    var cancelled = !elem.dispatchEvent(event);
+}
+
+
+var normalizedDisplay = document.getElementById("normPosition");
+var tipDisplay = document.getElementById("tipPosition");
+var windowDisplay = document.getElementById("windowPosition");
+
+var controller = Leap.loop({enableGestures: true}, function(frame){
+    scatter.select('#cursor').remove();
+
+    // if (frame.pointables.length > 0) {
+    //     console.log("pointables: ");
+    //     console.log(frame.pointables);
+    // }
+
+    // if (frame.pointables.length > 0) {
+    //     console.log("hands: ");
+    //     console.log(frame.hands);
+    // } 
+
+    var scatterPosition = [0,0];
+    var normalizedPosition = [0,0,0];
+
+    if (frame.valid) {
+        if (frame.pointables.length > 0) {
+            var pointable = frame.pointables[0];
+    
+            var interactionBox = frame.interactionBox;
+            var normalizedPosition = interactionBox.normalizePoint(pointable.tipPosition, true);
+            var tipPosition = pointable.tipPosition;
+            scatterPosition = [normalizedPosition[0] * width, normalizedPosition[1] * height];
+            normalizedDisplay.innerText = "(" + normalizedPosition[0] + ", "
+                                              + normalizedPosition[1] + ", "
+                                              + normalizedPosition[2] + ")";
+            tipDisplay.innerText = "(" + tipPosition[0] + ", " 
+                                       + tipPosition[1] + ", "
+                                       + tipPosition[2] + ")";
+            windowDisplay.innerText = "(" + scatterPosition[0] + ", " + scatterPosition[1] + ")";
+            scatter.append('circle')
+                        .attr('r', 20)
+                        .attr('cx', scatterPosition[0])
+                        .attr('cy', scatterPosition[1])
+                        .attr('fill', 'red')
+                        .attr('id', 'cursor');
+
+            
+        }
+
+        if(frame.gestures.length > 0){
+            var dotsElem = document.getElementById("innerSpace");
+            frame.gestures.forEach(function(gesture){
+                switch (gesture.type){
+                  case "circle":
+                      console.log("Circle Gesture");
+                      break;
+                  case "keyTap":
+                      console.log("Key Tap Gesture");
+                      break;
+                  case "screenTap":
+                      console.log("Screen Tap -- simulating click!");
+                    //   var position = gesture.position;
+                    //   console.log("position: " + JSON.stringify(position));
+                      
+                    //   var circleOne = document.getElementById('circle1');
+                    //   simulateClick(circleOne);
+                    // var k = (1-normalizedPosition[2])*8;
+                    // console.log("k: " + k);
+                    // var randomZoom = d3.zoomIdentity.translate(scatterPosition[0], scatterPosition[1]).scale(k);
+                    // var baseZoom = d3.zoomIdentity.translate(0,0).scale(1);
+                    // dots.call(zoom.transform, randomZoom);
+                    simulateClick(dotsElem, scatterPosition);
+
+                  case "swipe":
+                      console.log("Swipe gesture");
+                }
+            });
+          }
+    }
+
+   
+
+
+   
+  });
+  controller.connect();
 
