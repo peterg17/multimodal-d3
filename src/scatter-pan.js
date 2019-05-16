@@ -87,7 +87,7 @@ var dots = scatter.selectAll(".dot")
         .attr("cx", function (d) { return x(d.x); })
         .attr("cy", function (d) { return y(d.y); } )
         .attr("opacity", 0.5)
-        .style("fill", "#4292c6")
+        .style("fill", "#cc00ff")
 
 var gX = innerSpace.append("g")
     .attr("class", "x axis")
@@ -272,3 +272,80 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
     } 
   });
   controller.connect();
+
+  var processSpeech = function(transcript) {
+    // Helper function to detect if any commands appear in a string
+    var userSaid = function(str, commands) {
+      var lowercaseStr = str.toLowerCase();
+      for (var i = 0; i < commands.length; i++) {
+        if (lowercaseStr.indexOf(commands[i]) > -1)
+          return true;
+      }
+      return false;
+    };
+  
+    // console.log("transcript below:");
+    console.log(transcript);
+
+    if (userSaid(transcript, ['in'])) {
+        console.log('zoom in');
+        // var baseZoom = d3.zoomIdentity.duration(750).translate(scatterPosition[0],scatterPosition[1]).scale(2);
+        // dots.call(zoom.transform, baseZoom);
+        // simulateClick(dotsElem, scatterPosition);
+        var diffVector = [scatterPosition[0]-currPosition[0], scatterPosition[1]-currPosition[1]];
+        console.log("zoom translating by: " + diffVector);
+        var baseZoom = svg.call(zoom.translateBy, diffVector[0], diffVector[1]);
+        svg.call(zoom.scaleBy, 2);
+        currPosition = [scatterPosition[0], scatterPosition[1]];
+
+    } else if (userSaid(transcript, ['out'])) {
+        console.log('zoom out');
+        // var baseZoom = d3.zoomIdentity.translate(0,0).scale(1);
+        svg.call(zoom.scaleBy, 0.5);
+        // dots.call(zoom.transform, baseZoom);
+    } else {
+        console.log('false');
+    }
+};
+
+var DEBUGSPEECH = true;
+console.log(processSpeech);
+var debouncedProcessSpeech = _.debounce(processSpeech, 500);
+
+console.log("loading setup speech");
+var recognition = new webkitSpeechRecognition();
+recognition.continuous = true;
+recognition.interimResults = true;
+recognition.onresult = function(event) {
+  // Build the interim transcript, so we can process speech faster
+  var transcript = '';
+  var hasFinal = false;
+  for (var i = event.resultIndex; i < event.results.length; ++i) {
+    if (event.results[i].isFinal)
+      hasFinal = true;
+    else
+      transcript += event.results[i][0].transcript;
+  }
+  // console.log(event);
+
+  if (hasFinal)
+    console.log("SPEECH DEBUG: ready");
+  else
+    console.log("SPEECH DEBUG: " + transcript);
+  
+
+  var processed = debouncedProcessSpeech(transcript);
+  // var processed = processSpeech(transcript);
+
+  // If we reacted to speech, kill recognition and restart
+  if (processed) {
+    recognition.stop();
+  }
+};
+// Restart recognition if it has stopped
+recognition.onend = function(event) {
+  setTimeout(function() {
+    recognition.start();
+  }, 1000);
+};
+recognition.start();

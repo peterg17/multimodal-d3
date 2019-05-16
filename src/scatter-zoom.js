@@ -207,6 +207,8 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
     
             var interactionBox = frame.interactionBox;
             var normalizedPosition = interactionBox.normalizePoint(pointable.tipPosition, true);
+            // The y coordinate is inverted from what it should be
+            normalizedPosition[2] = 1 - normalizedPosition[2];
             var tipPosition = pointable.tipPosition;
             scatterPosition = [normalizedPosition[0] * width, normalizedPosition[1] * height];
             normalizedDisplay.innerText = "(" + normalizedPosition[0] + ", "
