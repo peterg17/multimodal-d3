@@ -6,7 +6,8 @@ module.exports = {
     scatter: './src/scatter.js',
     click: './src/click-sim.js',
     scatterZoom: './src/scatter-zoom.js',
-    scatterPan: './src/scatter-pan.js'
+    scatterPan: './src/scatter-pan.js',
+    editor: './src/put-that-there.js'
   },
   output: {
     filename: '[name].js',

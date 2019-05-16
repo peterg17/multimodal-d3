@@ -208,7 +208,7 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
             var interactionBox = frame.interactionBox;
             var normalizedPosition = interactionBox.normalizePoint(pointable.tipPosition, true);
             // The y coordinate is inverted from what it should be
-            normalizedPosition[2] = 1 - normalizedPosition[2];
+            normalizedPosition[1] = 1 - normalizedPosition[1];
             var tipPosition = pointable.tipPosition;
             scatterPosition = [normalizedPosition[0] * width, normalizedPosition[1] * height];
             normalizedDisplay.innerText = "(" + normalizedPosition[0] + ", "
@@ -219,10 +219,11 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
                                        + tipPosition[2] + ")";
             windowDisplay.innerText = "(" + scatterPosition[0] + ", " + scatterPosition[1] + ")";
             scatter.append('circle')
-                        .attr('r', 20)
+                        .attr('r', 10)
                         .attr('cx', scatterPosition[0])
                         .attr('cy', scatterPosition[1])
                         .attr('fill', 'red')
+                        .attr('opacity', 0.5)
                         .attr('id', 'cursor');
 
             

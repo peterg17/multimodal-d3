@@ -1,6 +1,5 @@
 
 import * as d3 from 'd3';
-import d3Tip from 'd3-tip';
 import * as Leap from 'leapjs';
 import 'leapjs-plugins';
 import './zoom.css';
@@ -261,10 +260,11 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
                 }
                 isGrabbing = false;
                 scatter.append('circle')
-                        .attr('r', 20)
+                        .attr('r', 10)
                         .attr('cx', scatterPosition[0])
                         .attr('cy', scatterPosition[1])
                         .attr('fill', 'red')
+                        .attr('opacity', 0.5)
                         .attr('id', 'cursor');
             }
             
@@ -287,7 +287,7 @@ var controller = Leap.loop({enableGestures: true}, function(frame){
     // console.log("transcript below:");
     console.log(transcript);
 
-    if (userSaid(transcript, ['in'])) {
+    if (userSaid(transcript, ['increase'])) {
         console.log('zoom in');
         // var baseZoom = d3.zoomIdentity.duration(750).translate(scatterPosition[0],scatterPosition[1]).scale(2);
         // dots.call(zoom.transform, baseZoom);
