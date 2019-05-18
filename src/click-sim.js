@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
 import * as Leap from 'leapjs';
 import 'leapjs-plugins';
-import './scatter.css';
 import * as $ from "jquery";
 
 var offsets = [50,100,150,200,250];
