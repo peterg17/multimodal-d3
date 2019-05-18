@@ -74,12 +74,16 @@ interact with this by
 
 ## Files
 
-| File Name                            | Purpose           |
+| File or Folder Name                            | Purpose       |
 | -------------                        | ------------- |
-| package.json                         |  | 
-| col 2 is                             | centered      | 
-| zebra stripes                        | are neat      |
-
-package.json - lists project settings and dependencies
-
-webpack.config.js - has build settings for webpack, input files are in src/ and output files in dist/
+| package.json                         | lists project settings and dependencies |
+| webpack.config.js      | has build settings for webpack, input files are in src/ and output files in dist/       | 
+| README.md                        | documentation      |
+| scripts/start-server.sh | used in `npm run server`, builds webpack and starts python simple server |
+| src/click-sim.js | javascript file for click.html visualization |
+| src/force.js | javascript file for force.html visualization |
+| src/put-that-there.js | javascript file for editor.html visualization |
+| src/scatter-pan.js | javascript file for scatterPan.html |
+| src/scatter-zoom.js | javascript file for scatterZoom.html |
+| src/zoom.css | css file used in scatterPan.html and scatterZoom.html |
+| dist/  | Webpack built js files, that are used in the properly named .html files |
